@@ -1,0 +1,13 @@
+{
+  "target_size": [48, 48],
+  "color_mode": "grayscale",
+  "use_clahe": true,
+  "clahe_clip_limit": 2.0,
+  "clahe_tile_grid_size": [8, 8],
+  "normalize": true,
+  "crop_padding": 0.15,
+  "square_crop": true,
+  "confidence_threshold": 0.35,
+  "num_classes": 8,
+  "dataset": "FERPlus"
+}
