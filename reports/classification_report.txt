@@ -1,0 +1,61 @@
+================================================================================
+BÁO CÁO ĐÁNH GIÁ MÔ HÌNH NHẬN DIỆN BIỂU CẢM KHUÔN MẶT FERPlus (8 LỚP)
+Mô hình: Improved CNN (GlobalAveragePooling2D + L2 Regularization + Dropout)
+Tiền xử lý: YOLOv8-Face -> Square Crop (Padding 15%) -> Grayscale -> CLAHE (Clip 2.0, Grid 8x8) -> Resize (48x48) -> Norm [0, 1]
+Tập dữ liệu: FERPlus Test Set (8,341 ảnh độc lập chuẩn hóa bởi Microsoft Research)
+================================================================================
+
+[1m66/66[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m13s[0m 198ms/step
+================ KẾT QUẢ ĐÁNH GIÁ TRÊN TẬP TEST ================
+Balanced Accuracy : 70.14%
+Macro-F1 Score    : 69.47%
+Weighted-F1 Score : 69.84%
+========================================================================
+
+Chi tiết Classification Report:
+              precision    recall  f1-score   support
+
+       angry     0.5884    0.7790    0.6704      1000
+    contempt     0.8538    0.3330    0.4791      1000
+     disgust     0.7655    0.5550    0.6435      1000
+        fear     0.8289    0.6780    0.7459      1000
+       happy     0.8489    0.8650    0.8569      1000
+     neutral     0.7268    0.8531    0.7849      1341
+         sad     0.5629    0.6850    0.6180      1000
+    surprise     0.6774    0.8630    0.7590      1000
+
+    accuracy                         0.7076      8341
+   macro avg     0.7316    0.7014    0.6947      8341
+weighted avg     0.7314    0.7076    0.6984      8341
+
+=======================================================
+ĐỘ CHÍNH XÁC RIÊNG CỦA TỪNG CẢM XÚC:
+=======================================================
+ - Angry     :  77.90% (779/1000 ảnh)
+ - Contempt  :  33.30% (333/1000 ảnh)
+ - Disgust   :  55.50% (555/1000 ảnh)
+ - Fear      :  67.80% (678/1000 ảnh)
+ - Happy     :  86.50% (865/1000 ảnh)
+ - Neutral   :  85.31% (1144/1341 ảnh)
+ - Sad       :  68.50% (685/1000 ảnh)
+ - Surprise  :  86.30% (863/1000 ảnh)
+=======================================================
+
+================================================================================
+PHÂN TÍCH CÁC LỚP CẢM XÚC YẾU VÀ ĐẶC THÙ MIỀN DỮ LIỆU:
+================================================================================
+1. Contempt (Khinh khi):
+   - Recall: 33.30%, F1-score: 47.91%.
+   - Nguyên nhân: Số lượng mẫu nhãn 'contempt' trong tự nhiên và tập dữ liệu FERPlus
+     tương đối khiêm tốn. Đặc trưng biểu cảm khinh khi thường là các biến dạng vi mô
+     không đối xứng (nhếch một bên mép), rất dễ bị làm phẳng khi nén về kích thước 48x48.
+2. Disgust (Ghê tởm):
+   - Recall: 55.50%, F1-score: 64.35%.
+   - Nguyên nhân: Biểu cảm nhăn mũi/chun môi của Disgust có sự tương đồng hình thái cao
+     với biểu cảm nhăn mặt của Angry, dẫn đến tỷ lệ nhầm lẫn đáng kể sang Angry.
+3. Sad (Buồn bã):
+   - Recall: 68.50%, F1-score: 61.80%.
+   - Thấp hơn so với các lớp biểu cảm mạnh như Happy (86.50% recall, 85.69% F1)
+     hoặc Surprise (86.30% recall, 75.90% F1). Sad thường bị nhầm lẫn nhẹ với Neutral
+     khi cường độ biểu cảm không cao.
+================================================================================

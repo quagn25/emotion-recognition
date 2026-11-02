@@ -1,0 +1,86 @@
+{
+  "project_name": "Facial Emotion Recognition with FERPlus (Microsoft Research)",
+  "model_deployed": "models/emotion_model.keras",
+  "model_architecture": "Improved_CNN_GAP",
+  "dataset": "FERPlus",
+  "num_classes": 8,
+  "labels_order": [
+    "angry",
+    "contempt",
+    "disgust",
+    "fear",
+    "happy",
+    "neutral",
+    "sad",
+    "surprise"
+  ],
+  "input_shape": [
+    48,
+    48,
+    1
+  ],
+  "test_dataset_size": 8341,
+  "overall_metrics": {
+    "accuracy": 0.7076,
+    "balanced_accuracy": 0.7014,
+    "macro_f1": 0.6947,
+    "weighted_f1": 0.6984,
+    "macro_precision": 0.7316,
+    "macro_recall": 0.7014
+  },
+  "per_class_metrics": {
+    "angry": {
+      "precision": 0.5884,
+      "recall": 0.779,
+      "f1_score": 0.6704,
+      "support": 1000
+    },
+    "contempt": {
+      "precision": 0.8538,
+      "recall": 0.333,
+      "f1_score": 0.4791,
+      "support": 1000
+    },
+    "disgust": {
+      "precision": 0.7655,
+      "recall": 0.555,
+      "f1_score": 0.6435,
+      "support": 1000
+    },
+    "fear": {
+      "precision": 0.8289,
+      "recall": 0.678,
+      "f1_score": 0.7459,
+      "support": 1000
+    },
+    "happy": {
+      "precision": 0.8489,
+      "recall": 0.865,
+      "f1_score": 0.8569,
+      "support": 1000
+    },
+    "neutral": {
+      "precision": 0.7268,
+      "recall": 0.8531,
+      "f1_score": 0.7849,
+      "support": 1341
+    },
+    "sad": {
+      "precision": 0.5629,
+      "recall": 0.685,
+      "f1_score": 0.618,
+      "support": 1000
+    },
+    "surprise": {
+      "precision": 0.6774,
+      "recall": 0.863,
+      "f1_score": 0.759,
+      "support": 1000
+    }
+  },
+  "weak_classes_summary": {
+    "contempt": "Recall thấp (33.30%) do số lượng mẫu gốc hạn chế và biểu hiện bất đối xứng vi mô.",
+    "disgust": "Độ chính xác 55.50%, dễ nhầm lẫn sang Angry.",
+    "sad": "F1-score 61.80%, thấp hơn Happy (85.69%) và Neutral (78.49%)."
+  }
+}
