@@ -1,0 +1,52 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Large dataset files & archives
+archive.zip
+*.zip
+*.tar.gz
+data/
+datasets/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs and environment
+*.log
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+.pytest_cache/
+temp_files/
+test_model/
+*.tmp
+*.mp4
+*.avi
+
+# Real-World Test Dataset (Chỉ commit cấu trúc thư mục & README, loại trừ toàn bộ ảnh)
+real_test/**/*.jpg
+real_test/**/*.jpeg
+real_test/**/*.png
+real_test/**/*.bmp
+real_test/**/*.webp
+!real_test/**/.gitkeep
+!real_test/README.md
