@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from main import app, _process_single_frame, smoother_manager
+from app.main import app, _process_single_frame, smoother_manager
 from app.config import settings
 from app.services.preprocessing import UnifiedPreprocessor
 from app.services.detector import FaceDetector

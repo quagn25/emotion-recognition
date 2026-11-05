@@ -1,4 +1,4 @@
-# Đề Tài: Ứng Dụng Mạng Nơ Ron Tích Chập Trong Nhận Dạng Biểu Cảm (Facial Emotion Recognition)
+# Đề Tài: Ứng Dụng Mạng Nơ Ron Tích Chập Trong Nhận Dạng Biểu Cảm (Emotion Recognition)
 
 Dự án Deep Learning phân loại cảm xúc khuôn mặt thời gian thực từ Webcam, Ảnh tĩnh và Video. Hệ thống kết hợp mạng phát hiện khuôn mặt **YOLOv8-Face**, pipeline tiền xử lý cân bằng độ tương phản cục bộ thích ứng **CLAHE (Contrast Limited Adaptive Histogram Equalization)**, mô hình phân loại **Improved CNN (GlobalAveragePooling2D + L2 Regularization)** tối ưu trên bộ dữ liệu **FERPlus (8 cảm xúc)**, và bộ làm mịn temporal đa phiên (`SessionSmootherManager`) với cơ chế gán định danh khuôn mặt (`track_id`).
 
@@ -66,91 +66,95 @@ models/
 ```text
 ProjectDL/
 ├── app/
+|   ├── main.py                   # FastAPI application & REST endpoints
 │   ├── config.py                 # Cấu hình hệ thống (DLL preloading, AppConfig)
 │   ├── schemas.py                # Pydantic Schemas cho API
 │   └── services/
 │       ├── detector.py           # YOLOv8-Face Detection (downscale optimization)
 │       ├── emotion_classifier.py # Improved CNN (8 lớp) + Margin-based Unknown filter
-│       ├── losses.py             # Categorical Focal Loss & Class Weight calculation
-│       ├── model_factory.py      # Baseline CNN, Improved CNN, MobileNetV3 architectures
 │       ├── preprocessing.py      # Pipeline Safe Square Crop + CLAHE
 │       ├── smoothing.py          # Temporal Smoothing & Session Manager (LRU max 100)
 │       └── video_service.py      # Video processor & track assignment
-├── configs/
-│   └── train.yaml                # Cấu hình siêu tham số tập trung & Ablation study
-├── models/                       # Gói mô hình đã khóa
+├── models/                       # Gói mô hình đã khóa (CNN & YOLOv8)
 ├── reports/                      # Báo cáo đánh giá và biểu đồ hiệu năng
 ├── real_test/                    # Tập dữ liệu kiểm thử webcam thực tế (8 lớp cảm xúc)
 ├── scripts/
 │   ├── capture_real_test.py     # Công cụ chụp mẫu trực tiếp từ webcam
 │   └── evaluate_real_test.py    # Script đánh giá đa chiều trên real_test
-├── tests/                        # Bộ kiểm thử tự động pytest (22 test cases, 100% Pass)
+├── tests/                        # Bộ kiểm thử tự động pytest
 │   ├── test_api.py
 │   ├── test_model.py
 │   ├── test_preprocessing.py
 │   ├── test_robustness.py        # Edge-cases: multi-face, occluded, tiny, corrupt video
 │   └── test_video.py
 ├── index.html                    # Giao diện web đề tài "Ứng dụng mạng nơ ron tích chập..."
-├── main.py                       # FastAPI application & REST endpoints
-├── train.py                      # CLI training & ablation script
-├── evaluate.py                   # CLI model evaluation script
-├── inference.py                  # CLI image/webcam inference script
-├── run.ps1                       # Script khởi động 1-click cho Windows
-├── run.sh                        # Script khởi động 1-click cho Linux/macOS
-├── project_emotions.ipynb        # Jupyter Notebook nghiên cứu & minh họa
+├── project_emotions.ipynb        # Jupyter Notebook nghiên cứu, huấn luyện & đánh giá
+├── train_log.csv                 # Lịch sử các chỉ số qua các epoch huấn luyện
+├── download_yolo.py              # Script hỗ trợ tải mô hình YOLOv8-Face
+├── Dockerfile                    # Cấu hình đóng gói Docker container
+├── docker-compose.yml            # Docker Compose chạy hệ thống CPU
+├── docker-compose.gpu.yml        # Docker Compose chạy hệ thống GPU (NVIDIA CUDA)
 └── requirements.txt              # Danh sách thư viện phụ thuộc
 ```
 
 ---
 
-## 4. Hướng Dẫn Khởi Chạy 1-Click
+## 4. Hướng Dẫn Khởi Chạy Ứng Dụng Web
 
-### Khởi động nhanh
-```powershell
-# Windows PowerShell
-.\run.ps1
-```
-```bash
-# Linux / macOS
-chmod +x run.sh && ./run.sh
-```
+### Cách 1: Chạy trực tiếp trên máy (Local)
 
-Hoặc chạy thủ công qua lệnh:
-```powershell
-.\.venv\Scripts\Activate.ps1
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-Truy cập giao diện: [http://localhost:8000](http://localhost:8000).
+1. **Kích hoạt môi trường ảo:**
+   ```powershell
+   .\.venv\Scripts\Activate.ps1
+   ```
+
+2. **Khởi động FastAPI Server:**
+   ```powershell
+   uvicorn main:app --reload --host 0.0.0.0 --port 8000
+   ```
+
+3. **Truy cập giao diện:**
+   Mở trình duyệt web và truy cập địa chỉ: **[http://localhost:8000](http://localhost:8000)** (hoặc `http://127.0.0.1:8000`).
 
 ---
 
-## 5. Pipeline CLI (Huấn Luyện, Đánh Giá, Suy Luận)
+### Cách 2: Khởi chạy bằng Docker Container
 
-### 1. Huấn luyện mô hình & Thực nghiệm bóc tách (Ablation Study)
+Dự án đã được cấu hình sẵn môi trường container hóa:
+
 ```powershell
-# Chạy với cấu hình mặc định trong configs/train.yaml
-python train.py
+# Chạy trên CPU
+docker-compose up --build
 
-# Huấn luyện thử nghiệm Baseline CNN không dùng CLAHE
-python train.py --model baseline_cnn --no-use-clahe --epochs 30
-
-# Huấn luyện MobileNetV3 với Focal Loss
-python train.py --model mobilenetv3 --loss focal_loss --epochs 40
+# Chạy trên GPU (yêu cầu NVIDIA Container Toolkit)
+docker-compose -f docker-compose.gpu.yml up --build
 ```
 
-### 2. Đánh giá mô hình CLI
-```powershell
-python evaluate.py --model models/emotion_model.keras --test-dir test/
-```
+---
 
-### 3. Suy luận trực tiếp CLI
-```powershell
-# Nhận diện trên ảnh tĩnh
-python inference.py --source test_image.jpg --output output.jpg
+## 5. Huấn Luyện & Nghiên Cứu Mô Hình (Jupyter Notebook)
 
-# Mở webcam trực tiếp qua OpenCV
-python inference.py --webcam 0
-```
+Toàn bộ quy trình nghiên cứu khoa học, bóc tách thực nghiệm và huấn luyện mô hình được đóng gói trọn vẹn trong tệp [`project_emotions.ipynb`](project_emotions.ipynb):
+
+1. **Chuẩn bị và tiền xử lý dữ liệu:**
+   - Trích xuất và phân chia dữ liệu từ bộ **FERPlus** (Train, Validation, Test độc lập).
+   - Áp dụng thuật toán cân bằng độ tương phản cục bộ thích ứng **CLAHE (Clip Limit = 2.0, Tile Grid = 8×8)** giúp chuẩn hóa ánh sáng và nổi bật các đặc trưng vi mô trên khuôn mặt.
+   - Kỹ thuật tăng cường dữ liệu nhẹ (Light Data Augmentation): xoay nhẹ, lật ngang, điều chỉnh độ sáng nhằm tránh méo mó hình thái biểu cảm.
+
+2. **Kiến trúc mô hình Improved CNN:**
+   - Các khối tích chập nhiều tầng với hàm kích hoạt `ReLU` và lớp `BatchNormalization`.
+   - Cơ chế gom cụm trung bình toàn cục (`GlobalAveragePooling2D`) kết hợp chuẩn hóa trọng số `L2 Regularization` và `Dropout` để kiểm soát hiện tượng overfitting.
+   - Đầu ra 8 nút Softmax đại diện cho 8 trạng thái cảm xúc.
+
+3. **Chiến lược tối ưu hóa:**
+   - Cân bằng trọng số lớp (`Class Weights`) để giải quyết tình trạng mất cân bằng dữ liệu giữa các lớp hiếm (`Contempt`, `Disgust`) và lớp phổ biến (`Happy`, `Neutral`).
+   - Kết hợp `EarlyStopping` và `ReduceLROnPlateau` giúp mô hình hội tụ ổn định.
+
+4. **Cách mở và chạy:**
+   - Khởi động Jupyter Notebook hoặc mở trực tiếp trên VS Code:
+     ```powershell
+     jupyter notebook project_emotions.ipynb
+     ```
 
 ---
 
@@ -182,7 +186,7 @@ Chạy toàn bộ 22 bài kiểm thử (bao gồm kiểm thử biên và kiểm 
 pytest tests/ -v
 ```
 
-Kết quả: **`22 passed (100% GREEN)`**:
+Kết quả:
 - Kiểm tra kết nối Health check & cấu hình 8 nhãn `/model-info`.
 - Kiểm tra giải mã an toàn Base64 và xử lý lỗi chuỗi độc hại.
 - Kiểm tra tính toán Bounding Box tại sát các mép viền ảnh.
